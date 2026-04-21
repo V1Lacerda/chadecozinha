@@ -45,23 +45,37 @@ exports.webhookMP = functions.https.onRequest(async (req, res) => {
 
   if (paymentId) {
     try {
-      const url = `https://api.mercadopago.com/v1/payments/${paymentId}`;
-      const response = await fetch(url, {
+      const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
         headers: {"Authorization": `Bearer ${client.accessToken}`},
       });
       const paymentData = await response.json();
 
       if (paymentData.status === "approved") {
         const docId = paymentData.external_reference;
-        await db.collection("products").doc(docId).update({
+        
+        // --- NOVIDADE: BUSCAR O NOME QUE VOCÊ SALVOU NO FIREBASE ---
+        const docRef = db.collection("products").doc(docId);
+        const docSnap = await docRef.get();
+        const productData = docSnap.data();
+
+        // Se existir um intent_by (nome que o convidado digitou), usamos ele. 
+        // Caso contrário, tentamos o nome do MP ou "Convidado".
+        const nomeFinal = productData.intent_by || paymentData.payer.first_name || "Convidado";
+        const telefoneFinal = productData.intent_phone || "Não informado";
+
+        await docRef.update({
           available: false,
-          chosen_by: paymentData.payer.first_name || "Convidado",
-          chosen_at: admin.firestore.FieldValue.serverTimestamp(),
+          chosen_by: nomeFinal, // <--- Agora salva o nome real!
+          chosen_phone: telefoneFinal,
+          chosen_at: new Date().toLocaleString("pt-BR", {timeZone: "America/Sao_Paulo"}),
           payment_id: paymentId,
         });
+
+        // Enviar e-mail também com o nome correto
+        // (Código do EmailJS aqui se você o configurou...)
       }
     } catch (err) {
-      console.error("Erro no Webhook:", err);
+      console.error("Erro no processamento do Webhook:", err);
     }
   }
   res.sendStatus(200);

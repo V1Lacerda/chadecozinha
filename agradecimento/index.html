@@ -3,18 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <title>Obrigado! 🌸</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:wght@400;600;700&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+    <link rel="icon" href="../catalogoicon.svg">
     <style>
-        body { font-family: 'Jost', sans-serif; text-align: center; padding: 50px; background: #fff0f5; }
-        .card { background: white; padding: 30px; border-radius: 20px; display: inline-block; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { color: #d4547a; }
+    body {
+        background-color: #fff5f8; /* O fundo rosa claro do seu tema */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        font-family: 'Cormorant Garamond', serif;
+        text-align: center;
+    }
+    h1 { font-family: 'Great Vibes', cursive; color: #b03a60; font-size: 3rem; }
     </style>
 </head>
+<!-- No <head> da sua agradecimento.html -->
+
+
 <body>
-    <div class="card">
-        <h1>Muito obrigado! 🌸</h1>
-        <p>Seu presente foi confirmado com sucesso.</p>
-        <p>Estamos muito felizes em ter você conosco nesse momento!</p>
-        <a href="../" style="color: #b03a60; text-decoration: none; font-weight: bold;">← Voltar para o catálogo</a>
-    </div>
+  <h1>Muito obrigado! 🌸</h1>
+  <p>Seu presente foi recebido com muito carinho.</p>
+
+  <script>
+    // Assim que a página carregar
+    window.onload = () => {
+      
+      // 1. Configura o Toast
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 5000, // 5 segundos
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      });
+
+      // 2. Exibe a mensagem
+      Toast.fire({
+        icon: 'success',
+        title: 'Sucesso!',
+        html: 'Voltando ao catálogo em 5 segundos...'
+      });
+
+      // 3. Redireciona após o tempo do timer
+      setTimeout(() => {
+        window.location.href = 'index.html'; // Altere para o link real se necessário
+      }, 5000);
+    };
+  </script>
 </body>
-</html>
